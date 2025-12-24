@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import PresentScreen from "@/components/PresentScreen";
+import WhenScreen from "@/components/WhenScreen";
 import JourneyTransition from "@/components/JourneyTransition";
 import DestinationScreen from "@/components/DestinationScreen";
 
-type Screen = "present" | "traveling" | "destination";
+type Screen = "present" | "when" | "traveling" | "destination";
 type Direction = "past" | "future" | null;
 
 const Index = () => {
@@ -14,7 +15,16 @@ const Index = () => {
 
   const handleNavigate = (dir: "past" | "future") => {
     setDirection(dir);
+    setScreen("when");
+  };
+
+  const handleWhenSubmit = () => {
     setScreen("traveling");
+  };
+
+  const handleWhenBack = () => {
+    setDirection(null);
+    setScreen("present");
   };
 
   const handleTransitionComplete = () => {
@@ -35,6 +45,15 @@ const Index = () => {
             key="present"
             onNavigate={handleNavigate}
             hasReturned={hasReturned}
+          />
+        )}
+
+        {screen === "when" && direction && (
+          <WhenScreen
+            key="when"
+            direction={direction}
+            onSubmit={handleWhenSubmit}
+            onBack={handleWhenBack}
           />
         )}
 
