@@ -1,15 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
-import { Heart, BookOpen, Clock, Star, Music, Gamepad2, Plane, Coffee, Sparkles } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Heart, BookOpen, Clock, Star, Music, Gamepad2, Plane, Coffee, Moon, Dumbbell, Utensils, Users, Sparkles, SkipForward } from "lucide-react";
 import TimeMachine from "./TimeMachine";
 import CatRobot from "./CatRobot";
+import StarfieldBackground from "./StarfieldBackground";
 
 interface DestinationScreenProps {
   direction: "past" | "future";
   onReturn: () => void;
 }
 
-type ThemeType = "love" | "study" | "work" | "travel" | "music" | "gaming" | "default";
+type ThemeType = "love" | "study" | "work" | "travel" | "music" | "gaming" | "sleep" | "fitness" | "food" | "friends" | "default";
 
 interface ThemeConfig {
   icons: React.ReactNode[];
@@ -22,19 +23,27 @@ interface ThemeConfig {
 const detectTheme = (input: string): ThemeType => {
   const lowerInput = input.toLowerCase();
   
-  const loveKeywords = ["love", "relationship", "girlfriend", "boyfriend", "crush", "date", "marry", "wedding", "heart", "romance", "partner", "kiss", "hug", "together", "breakup", "ex", "miss you", "i love", "pyaar", "dil"];
-  const studyKeywords = ["study", "exam", "school", "college", "university", "homework", "test", "grade", "learn", "book", "class", "teacher", "student", "degree", "education", "padhai"];
-  const workKeywords = ["work", "job", "office", "boss", "career", "meeting", "deadline", "project", "salary", "promotion", "interview", "resign", "business", "kaam"];
-  const travelKeywords = ["travel", "vacation", "trip", "flight", "holiday", "beach", "adventure", "explore", "visit", "abroad", "journey", "ghumna"];
-  const musicKeywords = ["music", "song", "sing", "concert", "band", "guitar", "piano", "dance", "party", "dj", "gaana"];
-  const gamingKeywords = ["game", "gaming", "play", "xbox", "playstation", "nintendo", "esports", "stream", "twitch", "khel"];
+  const loveKeywords = ["love", "relationship", "girlfriend", "boyfriend", "crush", "date", "marry", "wedding", "heart", "romance", "partner", "kiss", "hug", "together", "breakup", "ex", "miss you", "i love", "pyaar", "dil", "propose"];
+  const studyKeywords = ["study", "exam", "school", "college", "university", "homework", "test", "grade", "learn", "book", "class", "teacher", "student", "degree", "education", "padhai", "marks", "library"];
+  const workKeywords = ["work", "job", "office", "boss", "career", "meeting", "deadline", "project", "salary", "promotion", "interview", "resign", "business", "kaam", "money", "rich"];
+  const travelKeywords = ["travel", "vacation", "trip", "flight", "holiday", "beach", "adventure", "explore", "visit", "abroad", "journey", "ghumna", "paris", "london", "dubai"];
+  const musicKeywords = ["music", "song", "sing", "concert", "band", "guitar", "piano", "dance", "party", "dj", "gaana", "spotify"];
+  const gamingKeywords = ["game", "gaming", "play", "xbox", "playstation", "nintendo", "esports", "stream", "twitch", "khel", "pubg", "fortnite", "minecraft"];
+  const sleepKeywords = ["sleep", "nap", "rest", "tired", "bed", "dream", "lazy", "neend", "sona", "exhausted", "relax"];
+  const fitnessKeywords = ["gym", "workout", "exercise", "fitness", "muscle", "weight", "run", "jog", "health", "diet", "body"];
+  const foodKeywords = ["food", "eat", "pizza", "burger", "biryani", "khana", "hungry", "restaurant", "cook", "dinner", "lunch", "breakfast"];
+  const friendsKeywords = ["friend", "friends", "dost", "bestie", "buddy", "gang", "squad", "hangout", "party with"];
 
   if (loveKeywords.some(kw => lowerInput.includes(kw))) return "love";
   if (studyKeywords.some(kw => lowerInput.includes(kw))) return "study";
   if (workKeywords.some(kw => lowerInput.includes(kw))) return "work";
+  if (sleepKeywords.some(kw => lowerInput.includes(kw))) return "sleep";
   if (travelKeywords.some(kw => lowerInput.includes(kw))) return "travel";
   if (musicKeywords.some(kw => lowerInput.includes(kw))) return "music";
   if (gamingKeywords.some(kw => lowerInput.includes(kw))) return "gaming";
+  if (fitnessKeywords.some(kw => lowerInput.includes(kw))) return "fitness";
+  if (foodKeywords.some(kw => lowerInput.includes(kw))) return "food";
+  if (friendsKeywords.some(kw => lowerInput.includes(kw))) return "friends";
   
   return "default";
 };
@@ -42,53 +51,81 @@ const detectTheme = (input: string): ThemeType => {
 const getThemeConfig = (theme: ThemeType, direction: "past" | "future"): ThemeConfig => {
   const configs: Record<ThemeType, ThemeConfig> = {
     love: {
-      icons: Array(12).fill(null).map((_, i) => <Heart key={i} className="w-full h-full" fill="currentColor" />),
-      message: direction === "past" ? "Love and you?" : "Future love awaits!",
-      subMessage: "Go back! 💔",
-      color: "hsl(340 80% 60%)",
-      glowColor: "hsl(340 80% 60% / 0.6)",
+      icons: Array(15).fill(null).map((_, i) => <Heart key={i} className="w-full h-full" fill="currentColor" />),
+      message: direction === "past" ? "Ah, young love..." : "Future love awaits!",
+      subMessage: "Still unresolved? Back to reality! 💔",
+      color: "hsl(340 85% 60%)",
+      glowColor: "hsl(340 85% 60% / 0.7)",
     },
     study: {
-      icons: Array(10).fill(null).map((_, i) => <BookOpen key={i} className="w-full h-full" />),
-      message: direction === "past" ? "Oops!" : "More exams ahead!",
-      subMessage: "Back to reality! 📚",
-      color: "hsl(45 90% 55%)",
-      glowColor: "hsl(45 90% 55% / 0.6)",
+      icons: Array(12).fill(null).map((_, i) => i % 2 === 0 ? <BookOpen key={i} className="w-full h-full" /> : <Clock key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Books flew, dreams shattered..." : "More exams incoming!",
+      subMessage: "Present wins again! 📚",
+      color: "hsl(45 95% 55%)",
+      glowColor: "hsl(45 95% 55% / 0.7)",
     },
     work: {
-      icons: Array(10).fill(null).map((_, i) => <Clock key={i} className="w-full h-full" />),
-      message: direction === "past" ? "Time's up!" : "Deadlines never end!",
-      subMessage: "Back to present! ⏰",
-      color: "hsl(200 80% 55%)",
-      glowColor: "hsl(200 80% 55% / 0.6)",
+      icons: Array(12).fill(null).map((_, i) => <Clock key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Overtime flashbacks!" : "Deadlines never die!",
+      subMessage: "Time's up, back to present! ⏰",
+      color: "hsl(200 85% 55%)",
+      glowColor: "hsl(200 85% 55% / 0.7)",
+    },
+    sleep: {
+      icons: Array(12).fill(null).map((_, i) => <Moon key={i} className="w-full h-full" fill="currentColor" />),
+      message: direction === "past" ? "Zzz... those were the days!" : "Future naps pending...",
+      subMessage: "Nap time over, reality calls! 😴",
+      color: "hsl(250 70% 65%)",
+      glowColor: "hsl(250 70% 65% / 0.7)",
     },
     travel: {
-      icons: Array(10).fill(null).map((_, i) => <Plane key={i} className="w-full h-full" />),
-      message: direction === "past" ? "Trip memory!" : "Adventure awaits!",
-      subMessage: "Unlocked! ✈️",
-      color: "hsl(180 70% 50%)",
-      glowColor: "hsl(180 70% 50% / 0.6)",
+      icons: Array(12).fill(null).map((_, i) => <Plane key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Passport to memories!" : "Adventures await!",
+      subMessage: "But first, back to base! ✈️",
+      color: "hsl(180 75% 50%)",
+      glowColor: "hsl(180 75% 50% / 0.7)",
     },
     music: {
-      icons: Array(10).fill(null).map((_, i) => <Music key={i} className="w-full h-full" />),
-      message: direction === "past" ? "Those tunes!" : "Future beats!",
-      subMessage: "Hit different! 🎵",
-      color: "hsl(280 70% 60%)",
-      glowColor: "hsl(280 70% 60% / 0.6)",
+      icons: Array(12).fill(null).map((_, i) => <Music key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Those tunes hit different!" : "Future anthems loading...",
+      subMessage: "But the present has its beat! 🎵",
+      color: "hsl(300 75% 60%)",
+      glowColor: "hsl(300 75% 60% / 0.7)",
     },
     gaming: {
-      icons: Array(10).fill(null).map((_, i) => <Gamepad2 key={i} className="w-full h-full" />),
-      message: direction === "past" ? "GG!" : "New game+",
-      subMessage: "Returning to spawn... 🎮",
-      color: "hsl(150 80% 50%)",
-      glowColor: "hsl(150 80% 50% / 0.6)",
+      icons: Array(12).fill(null).map((_, i) => <Gamepad2 key={i} className="w-full h-full" />),
+      message: direction === "past" ? "GG! Good times!" : "New game+ loading...",
+      subMessage: "Respawning in present... 🎮",
+      color: "hsl(150 85% 50%)",
+      glowColor: "hsl(150 85% 50% / 0.7)",
+    },
+    fitness: {
+      icons: Array(12).fill(null).map((_, i) => <Dumbbell key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Gains and pains!" : "Future gains await!",
+      subMessage: "But today is leg day! 💪",
+      color: "hsl(15 85% 55%)",
+      glowColor: "hsl(15 85% 55% / 0.7)",
+    },
+    food: {
+      icons: Array(12).fill(null).map((_, i) => i % 2 === 0 ? <Utensils key={i} className="w-full h-full" /> : <Coffee key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Tasty memories!" : "Future feasts await!",
+      subMessage: "But dinner's ready now! 🍕",
+      color: "hsl(30 90% 55%)",
+      glowColor: "hsl(30 90% 55% / 0.7)",
+    },
+    friends: {
+      icons: Array(12).fill(null).map((_, i) => <Users key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Squad memories!" : "Future hangouts await!",
+      subMessage: "Group chat is waiting! 👥",
+      color: "hsl(270 75% 60%)",
+      glowColor: "hsl(270 75% 60% / 0.7)",
     },
     default: {
-      icons: Array(10).fill(null).map((_, i) => i % 2 === 0 ? <Star key={i} className="w-full h-full" fill="currentColor" /> : <Sparkles key={i} className="w-full h-full" />),
-      message: direction === "past" ? "Memory accessed!" : "Future pending...",
+      icons: Array(12).fill(null).map((_, i) => i % 2 === 0 ? <Star key={i} className="w-full h-full" fill="currentColor" /> : <Sparkles key={i} className="w-full h-full" />),
+      message: direction === "past" ? "Memory unlocked!" : "Future buffering...",
       subMessage: "Time warp complete! ✨",
       color: "hsl(195 100% 55%)",
-      glowColor: "hsl(195 100% 55% / 0.6)",
+      glowColor: "hsl(195 100% 55% / 0.7)",
     },
   };
   
@@ -96,8 +133,8 @@ const getThemeConfig = (theme: ThemeType, direction: "past" | "future"): ThemeCo
 };
 
 const pastResponses = [
-  "That version of you already did their best.",
-  "You survived it. That's what matters.",
+  "That version of you did their best.",
+  "You survived it. That's what counts.",
   "Some lessons only work once.",
   "The past heard you. It just can't answer.",
   "That timeline is sealed. You made it out.",
@@ -107,7 +144,7 @@ const futureResponses = [
   "Noted. The future is listening.",
   "Hope logged. No delivery date.",
   "Let's not spoil it.",
-  "Filed. Universe will get back to you.",
+  "Filed. Universe will respond.",
   "Acknowledged. It's in the queue.",
 ];
 
@@ -116,43 +153,50 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
   const [showResponse, setShowResponse] = useState(false);
   const [response, setResponse] = useState("");
   const [theme, setTheme] = useState<ThemeType>("default");
-  const [catBounce, setCatBounce] = useState(false);
+  const [canSkip, setCanSkip] = useState(false);
 
   const themeConfig = useMemo(() => getThemeConfig(theme, direction), [theme, direction]);
 
-  // Generate random positions for floating icons - more spread out
+  // Generate random positions for floating icons - more elaborate
   const floatingIcons = useMemo(() => {
     return themeConfig.icons.map((icon, i) => ({
       icon,
-      initialX: 10 + (i % 5) * 20 + Math.random() * 10,
-      initialY: 10 + Math.floor(i / 5) * 40 + Math.random() * 20,
-      size: 40 + Math.random() * 40, // 40-80px icons
-      delay: i * 0.1,
-      duration: 2.5 + Math.random() * 1.5,
+      startX: Math.random() * 100,
+      startY: 100 + Math.random() * 20,
+      size: 50 + Math.random() * 60,
+      delay: i * 0.12,
+      duration: 3 + Math.random() * 2,
+      rotateAmount: 360 + Math.random() * 360,
+      horizontalDrift: (Math.random() - 0.5) * 100,
     }));
   }, [themeConfig.icons]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
     const detectedTheme = detectTheme(inputValue);
     setTheme(detectedTheme);
-    setCatBounce(true);
 
     const responses = direction === "past" ? pastResponses : futureResponses;
     const randomResponse = responses[Math.floor(Math.random() * responses.length)];
     setResponse(randomResponse);
     setShowResponse(true);
-  };
+  }, [inputValue, direction]);
 
-  // Auto-return after showing response with full animation
+  const handleSkip = useCallback(() => {
+    onReturn();
+  }, [onReturn]);
+
+  // Enable skip after 2 seconds, auto-return after 5.5 seconds
   useEffect(() => {
     if (showResponse) {
-      const timer = setTimeout(() => {
-        onReturn();
-      }, 5500); // 5.5 seconds for full animation experience
-      return () => clearTimeout(timer);
+      const skipTimer = setTimeout(() => setCanSkip(true), 2000);
+      const returnTimer = setTimeout(() => onReturn(), 5500);
+      return () => {
+        clearTimeout(skipTimer);
+        clearTimeout(returnTimer);
+      };
     }
   }, [showResponse, onReturn]);
 
@@ -166,15 +210,18 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="absolute inset-0 cyber-grid opacity-20" />
-      
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(ellipse at center, 
-            ${direction === "past" ? "hsl(280 100% 65% / 0.15)" : "hsl(150 100% 50% / 0.15)"} 0%, 
-            transparent 60%)`
+      {/* Starfield background */}
+      <StarfieldBackground intensity="medium" />
+
+      {/* Theme-colored overlay */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none"
+        animate={showResponse ? {
+          background: `radial-gradient(ellipse at center, ${themeConfig.glowColor} 0%, transparent 60%)`,
+        } : {
+          background: `radial-gradient(ellipse at center, ${direction === "past" ? "hsl(280 100% 65% / 0.15)" : "hsl(150 100% 50% / 0.15)"} 0%, transparent 60%)`,
         }}
+        transition={{ duration: 0.5 }}
       />
 
       <AnimatePresence mode="wait">
@@ -184,7 +231,7 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
             className="relative z-10 w-full max-w-lg text-center"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, y: -30, scale: 0.9 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
             <h2 className={`text-4xl md:text-5xl font-display mb-12 ${direction === "past" ? "neon-text-violet" : "neon-text-green"}`}>
@@ -234,7 +281,7 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
         ) : (
           <motion.div
             key="response"
-            className="relative z-10 flex flex-col items-center w-full"
+            className="relative z-10 flex flex-col items-center w-full min-h-screen justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
@@ -243,22 +290,22 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
             {floatingIcons.map((item, i) => (
               <motion.div
                 key={i}
-                className="absolute pointer-events-none"
+                className="absolute pointer-events-none z-0"
                 style={{
-                  left: `${item.initialX}%`,
-                  top: `${item.initialY}%`,
+                  left: `${item.startX}%`,
+                  bottom: "0%",
                   width: `${item.size}px`,
                   height: `${item.size}px`,
                   color: themeConfig.color,
-                  filter: `drop-shadow(0 0 20px ${themeConfig.glowColor})`,
+                  filter: `drop-shadow(0 0 25px ${themeConfig.glowColor})`,
                 }}
-                initial={{ opacity: 0, scale: 0, y: 100 }}
+                initial={{ opacity: 0, scale: 0, y: 0 }}
                 animate={{
                   opacity: [0, 1, 1, 0.8, 0],
-                  scale: [0.3, 1.5, 1.2, 1, 0.5],
-                  y: [100, 0, -50, -150, -250],
-                  x: [0, Math.sin(i * 0.8) * 50, Math.cos(i * 0.6) * 40, Math.sin(i) * 30, 0],
-                  rotate: [0, 180, 360, 540, 720],
+                  scale: [0.3, 1.4, 1.2, 1, 0.6],
+                  y: [0, -200, -400, -600, -800],
+                  x: [0, item.horizontalDrift * 0.5, item.horizontalDrift, item.horizontalDrift * 0.5, 0],
+                  rotate: [0, item.rotateAmount * 0.3, item.rotateAmount * 0.6, item.rotateAmount],
                 }}
                 transition={{
                   duration: item.duration,
@@ -271,25 +318,24 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
               </motion.div>
             ))}
 
-            {/* Giant themed message - visually dominant */}
+            {/* Giant themed message - at top */}
             <motion.div
-              className="absolute top-8 left-0 right-0 text-center z-20"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="absolute top-16 md:top-20 left-0 right-0 text-center z-20 px-4"
+              initial={{ scale: 0, opacity: 0, y: -50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 150, damping: 15 }}
             >
               <motion.h1
-                className="text-5xl md:text-7xl font-display font-bold"
+                className="text-4xl sm:text-5xl md:text-7xl font-display font-bold leading-tight"
                 style={{
                   color: themeConfig.color,
-                  textShadow: `0 0 30px ${themeConfig.glowColor}, 0 0 60px ${themeConfig.glowColor}, 0 0 90px ${themeConfig.glowColor}`,
+                  textShadow: `0 0 30px ${themeConfig.glowColor}, 0 0 60px ${themeConfig.glowColor}, 0 0 100px ${themeConfig.glowColor}`,
                 }}
                 animate={{
-                  scale: [1, 1.05, 1],
-                  opacity: [0.9, 1, 0.9],
+                  scale: [1, 1.03, 1],
                 }}
                 transition={{
-                  duration: 1.5,
+                  duration: 2,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
@@ -297,7 +343,7 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
                 {themeConfig.message}
               </motion.h1>
               <motion.p
-                className="text-3xl md:text-4xl font-display mt-2"
+                className="text-2xl md:text-3xl font-display mt-3"
                 style={{
                   color: themeConfig.color,
                   textShadow: `0 0 20px ${themeConfig.glowColor}`,
@@ -310,29 +356,29 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
               </motion.p>
             </motion.div>
 
-            {/* Time Machine with Cat - 60-70% width */}
+            {/* Time Machine with Cat - 60-70% width, centered */}
             <motion.div
-              className="relative mt-32 md:mt-40"
-              style={{ width: "65%", maxWidth: "400px" }}
-              initial={{ scale: 0.5, opacity: 0 }}
+              className="relative z-10"
+              style={{ width: "min(65vw, 400px)" }}
+              initial={{ scale: 0.3, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
+              transition={{ delay: 0.4, duration: 0.6, type: "spring", stiffness: 100 }}
             >
-              <div className="transform scale-90 md:scale-100">
+              <div className="transform scale-75 md:scale-90">
                 <TimeMachine />
               </div>
               
               {/* Cat with cheeky bounce */}
               <motion.div
                 className="absolute -top-8 md:-top-4 left-1/2 -translate-x-1/2"
-                animate={catBounce ? {
-                  y: [0, -20, 0, -15, 0, -10, 0],
-                  rotate: [0, -5, 5, -3, 3, 0],
-                } : {}}
+                animate={{
+                  y: [0, -25, 0, -18, 0, -10, 0],
+                  rotate: [0, -8, 8, -5, 5, 0],
+                }}
                 transition={{
-                  duration: 1.5,
+                  duration: 2,
                   repeat: Infinity,
-                  repeatDelay: 1,
+                  repeatDelay: 0.5,
                   ease: "easeOut",
                 }}
               >
@@ -340,29 +386,29 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
               </motion.div>
             </motion.div>
 
-            {/* Response text */}
+            {/* Response text - below machine */}
             <motion.div
-              className="text-center max-w-xl px-4 mt-8"
-              initial={{ y: 30, opacity: 0 }}
+              className="text-center max-w-xl px-4 mt-6 z-20"
+              initial={{ y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.5 }}
+              transition={{ delay: 0.9, duration: 0.5 }}
             >
               <motion.p
-                className={`text-xl md:text-2xl font-display leading-relaxed ${direction === "past" ? "neon-text-violet" : "neon-text-green"}`}
+                className={`text-lg md:text-xl font-display leading-relaxed ${direction === "past" ? "neon-text-violet" : "neon-text-green"}`}
               >
                 "{response}"
               </motion.p>
               
-              {/* Progress bar for return countdown */}
+              {/* Progress bar */}
               <motion.div
-                className="mt-6 w-full max-w-xs mx-auto h-1.5 rounded-full overflow-hidden"
-                style={{ background: "hsl(230 20% 20%)" }}
+                className="mt-6 w-full max-w-xs mx-auto h-2 rounded-full overflow-hidden"
+                style={{ background: "hsl(230 20% 15%)" }}
               >
                 <motion.div
                   className="h-full rounded-full"
                   style={{ 
                     background: `linear-gradient(90deg, ${themeConfig.color}, hsl(195 100% 55%))`,
-                    boxShadow: `0 0 10px ${themeConfig.glowColor}`,
+                    boxShadow: `0 0 15px ${themeConfig.glowColor}`,
                   }}
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
@@ -372,13 +418,35 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
               
               <motion.p
                 className="mt-3 text-muted-foreground font-sans text-sm"
-                initial={{ opacity: 0 }}
                 animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ delay: 1, duration: 2, repeat: Infinity }}
+                transition={{ duration: 1.5, repeat: Infinity }}
               >
                 Returning to the present...
               </motion.p>
             </motion.div>
+
+            {/* Skip button */}
+            <AnimatePresence>
+              {canSkip && (
+                <motion.button
+                  onClick={handleSkip}
+                  className="absolute bottom-8 right-8 z-30 flex items-center gap-2 px-4 py-2 rounded-full
+                             text-muted-foreground hover:text-foreground transition-colors"
+                  style={{
+                    background: "hsl(230 25% 12% / 0.8)",
+                    border: "1px solid hsl(195 100% 55% / 0.3)",
+                  }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  whileHover={{ scale: 1.05, borderColor: "hsl(195 100% 55% / 0.6)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span className="text-sm font-sans">Skip</span>
+                  <SkipForward className="w-4 h-4" />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
