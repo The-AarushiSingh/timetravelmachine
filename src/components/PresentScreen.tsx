@@ -9,21 +9,21 @@ interface PresentScreenProps {
 }
 
 const PresentScreen = ({ onNavigate, hasReturned }: PresentScreenProps) => {
-  const [catState, setCatState] = useState<"floating" | "waving" | "sitting">("floating");
+  const [catArrived, setCatArrived] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
-    // Cat entrance sequence
-    const timer = setTimeout(() => {
-      setCatState("waving");
-    }, 1500);
+    // Cat arrives at center after floating animation
+    const arriveTimer = setTimeout(() => {
+      setCatArrived(true);
+    }, 2000);
     
     const welcomeTimer = setTimeout(() => {
       setShowWelcome(true);
     }, 800);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(arriveTimer);
       clearTimeout(welcomeTimer);
     };
   }, []);
@@ -71,23 +71,24 @@ const PresentScreen = ({ onNavigate, hasReturned }: PresentScreenProps) => {
             <TimeMachine />
           </motion.div>
 
-          {/* Cat robot - positioned on top of machine */}
+          {/* Cat robot - positioned centered on top of machine */}
           <motion.div
-            className="absolute -top-8 md:-top-4 left-1/2 -translate-x-1/2"
-            initial={{ opacity: 0, y: -100, x: 100 }}
+            className="absolute -top-6 md:-top-2 left-1/2"
+            initial={{ opacity: 0, y: -150, x: 150 }}
             animate={{ 
               opacity: 1, 
-              y: catState === "sitting" ? 0 : -20,
-              x: 0,
+              y: catArrived ? 0 : -30,
+              x: "-50%",
             }}
             transition={{ 
-              delay: 0.8, 
-              duration: 1.2,
+              delay: 0.5, 
+              duration: 1.5,
               type: "spring",
-              stiffness: 100,
+              stiffness: 60,
+              damping: 12,
             }}
           >
-            <CatRobot state={catState} onAnimationComplete={() => setCatState("sitting")} />
+            <CatRobot isWaving={catArrived} />
           </motion.div>
         </div>
 
