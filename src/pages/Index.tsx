@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import PresentScreen from "@/components/PresentScreen";
 import WhenScreen from "@/components/WhenScreen";
 import JourneyTransition from "@/components/JourneyTransition";
 import DestinationScreen from "@/components/DestinationScreen";
+import SoundToggle from "@/components/SoundToggle";
 
 type Screen = "present" | "when" | "traveling" | "destination";
 type Direction = "past" | "future" | null;
@@ -12,6 +13,36 @@ const Index = () => {
   const [screen, setScreen] = useState<Screen>("present");
   const [direction, setDirection] = useState<Direction>(null);
   const [hasReturned, setHasReturned] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize audio on first render
+  useEffect(() => {
+    audioRef.current = new Audio("/sounds/time-travel.mp3");
+    audioRef.current.loop = false;
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const playSound = useCallback(() => {
+    if (!isMuted && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {
+        // Autoplay may be blocked
+      });
+    }
+  }, [isMuted]);
+
+  const stopSound = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, []);
 
   const handleNavigate = (dir: "past" | "future") => {
     setDirection(dir);
@@ -20,6 +51,7 @@ const Index = () => {
 
   const handleWhenSubmit = () => {
     setScreen("traveling");
+    playSound();
   };
 
   const handleWhenBack = () => {
@@ -28,6 +60,7 @@ const Index = () => {
   };
 
   const handleTransitionComplete = () => {
+    stopSound();
     setScreen("destination");
   };
 
@@ -37,8 +70,14 @@ const Index = () => {
     setScreen("present");
   };
 
+  const toggleMute = () => {
+    setIsMuted(prev => !prev);
+  };
+
   return (
     <main className="min-h-screen bg-background overflow-hidden">
+      <SoundToggle isMuted={isMuted} onToggle={toggleMute} />
+      
       <AnimatePresence mode="wait">
         {screen === "present" && (
           <PresentScreen
