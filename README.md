@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
+# Time-Machine--Temporal Catastrophe
 
-## Project info
+# Temporal Catastrophe 🕰️😸
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+A hilariously useless **time travel web app** where your dreams of going back to the past or rushing to the future collide with reality… and a waving robot cat.  
 
-## How can I edit this code?
+Built for **Code At Christmas 2025** — a hackathon where weird, funny, and cozy projects win hearts.  
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- 🎩 **Time Machine UI** – centered, animated, neon-dark vibes.  
+- 😺 **Robot Cat** – waves while sitting on the machine, reacts to travel.  
+- 🕒 **Travel to Past or Future** – input your desired time and embark on a chaotic journey.  
+- 🎵 **Chalooo Sound** – iconic meme sound plays during travel.  
+- 😂 **Funny Destination Moments** – elaborated based on your input:
+  - Love → floating hearts & cheeky text
+  - Study → flying books & clocks spinning
+  - Sleep → cat snoozes with Zzzs floating  
+- 🔊 **Mute/Unmute Toggle** – control travel and funny sounds independently.  
+- 🌟 **Dynamic Animations** – parallax backgrounds, particle effects, smooth motion.  
+- 🖼️ **Memorable Humor** – the app doesn’t improve productivity, it celebrates failed plans and silly dreams.  
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## How to Use
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. Open the app in your browser.  
+2. Click **PAST** or **FUTURE**.  
+3. Enter your desired time.  
+4. Enjoy your chaotic journey with the robot cat, meme sounds, and funny animations.  
+5. Return to the present… hopefully wiser (or at least entertained).  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## Tech Stack
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Frontend:** HTML, CSS, JavaScript  
+- **Animations:** CSS + JS  
+- **Sounds:** MP3 for chalooo & funny moment effects  
+- **Hosting:** GitHub Pages  
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Notes
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- Designed for **fun, chaos, and vibes**, not productivity.  
+- Every journey is unique depending on your input.  
+- Mute/unmute options for full control.  
+- Inspired by nostalgic meme culture + chaotic personal dreams.  
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Demo
 
-**Use GitHub Codespaces**
+![Temporal Catastrophe GIF](path-to-gif-or-screenshot.gif)  
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Check out the live demo here: [https://timetravelmachine.lovable.app/]  
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Contribute
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- PRs welcome for new funny animations, extra sounds, or Easter eggs.  
+- Keep it **weird and cozy**.  
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## License
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT License
