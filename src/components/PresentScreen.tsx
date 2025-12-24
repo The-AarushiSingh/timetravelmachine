@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import TimeMachine from "./TimeMachine";
 import CatRobot from "./CatRobot";
+import StarfieldBackground from "./StarfieldBackground";
 
 interface PresentScreenProps {
   onNavigate: (direction: "past" | "future") => void;
@@ -36,33 +37,29 @@ const PresentScreen = ({ onNavigate, hasReturned }: PresentScreenProps) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Cyber grid background */}
-      <div className="absolute inset-0 cyber-grid" />
+      {/* Starfield background */}
+      <StarfieldBackground intensity="medium" />
       
-      {/* Gradient overlays */}
-      <div 
-        className="absolute inset-0"
+      {/* Central glow */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, hsl(195 100% 55% / 0.08) 0%, transparent 50%)",
+          background: "radial-gradient(ellipse at center, hsl(195 100% 55% / 0.1) 0%, transparent 50%)",
         }}
-      />
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: "radial-gradient(ellipse at 30% 20%, hsl(280 100% 65% / 0.06) 0%, transparent 40%)",
+        animate={{
+          opacity: [0.5, 0.8, 0.5],
         }}
-      />
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: "radial-gradient(ellipse at 70% 80%, hsl(150 100% 50% / 0.06) 0%, transparent 40%)",
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
         }}
       />
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center">
-        {/* Time machine with cat on top */}
-        <div className="relative">
+        {/* Time machine with cat on top - 60-70% width */}
+        <div className="relative" style={{ width: "min(70vw, 500px)" }}>
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -174,26 +171,28 @@ const PresentScreen = ({ onNavigate, hasReturned }: PresentScreenProps) => {
         </motion.div>
       </div>
 
-      {/* Ambient floating particles */}
-      {[...Array(12)].map((_, i) => (
+      {/* Extra ambient particles */}
+      {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full"
+          className="absolute w-2 h-2 rounded-full pointer-events-none"
           style={{
             background: i % 3 === 0 ? "hsl(195 100% 55%)" : i % 3 === 1 ? "hsl(280 100% 65%)" : "hsl(150 100% 50%)",
-            left: `${10 + (i * 7)}%`,
-            top: `${15 + (i % 5) * 18}%`,
-            boxShadow: "0 0 8px currentColor",
+            left: `${10 + (i * 12)}%`,
+            top: `${20 + (i % 4) * 20}%`,
+            boxShadow: "0 0 15px currentColor",
           }}
           animate={{
-            y: [-15, 15, -15],
-            opacity: [0.3, 0.8, 0.3],
+            y: [-20, 20, -20],
+            x: [-10, 10, -10],
+            opacity: [0.4, 0.9, 0.4],
+            scale: [0.8, 1.2, 0.8],
           }}
           transition={{
-            duration: 3 + i * 0.3,
+            duration: 4 + i * 0.5,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: i * 0.2,
+            delay: i * 0.3,
           }}
         />
       ))}

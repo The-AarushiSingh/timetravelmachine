@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import StarfieldBackground from "./StarfieldBackground";
 
 interface WhenScreenProps {
   direction: "past" | "future";
@@ -29,15 +30,15 @@ const WhenScreen = ({ direction, onSubmit, onBack }: WhenScreenProps) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Cyber grid background */}
-      <div className="absolute inset-0 cyber-grid opacity-30" />
+      {/* Starfield background */}
+      <StarfieldBackground intensity="low" />
       
       {/* Gradient overlay */}
       <div 
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background: `radial-gradient(ellipse at center, 
-            ${direction === "past" ? "hsl(280 100% 65% / 0.1)" : "hsl(150 100% 50% / 0.1)"} 0%, 
+            ${direction === "past" ? "hsl(280 100% 65% / 0.15)" : "hsl(150 100% 50% / 0.15)"} 0%, 
             transparent 60%)`
         }}
       />
