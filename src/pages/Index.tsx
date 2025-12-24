@@ -60,12 +60,11 @@ const Index = () => {
   };
 
   const handleTransitionComplete = () => {
-    // Sound continues playing through destination screen
+    stopSound(); // Stop chalooo when travel ends
     setScreen("destination");
   };
 
   const handleReturn = () => {
-    stopSound(); // Stop sound when returning to present
     setHasReturned(true);
     setDirection(null);
     setScreen("present");
@@ -110,6 +109,7 @@ const Index = () => {
             key="destination"
             direction={direction}
             onReturn={handleReturn}
+            isMuted={isMuted}
           />
         )}
       </AnimatePresence>

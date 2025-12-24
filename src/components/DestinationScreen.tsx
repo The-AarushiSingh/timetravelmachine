@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Heart, BookOpen, Clock, Star, Music, Gamepad2, Plane, Coffee, Moon, Dumbbell, Utensils, Users, Sparkles, SkipForward } from "lucide-react";
 import TimeMachine from "./TimeMachine";
 import CatRobot from "./CatRobot";
@@ -8,6 +8,7 @@ import StarfieldBackground from "./StarfieldBackground";
 interface DestinationScreenProps {
   direction: "past" | "future";
   onReturn: () => void;
+  isMuted?: boolean;
 }
 
 type ThemeType = "love" | "study" | "work" | "travel" | "music" | "gaming" | "sleep" | "fitness" | "food" | "friends" | "default";
@@ -148,12 +149,38 @@ const futureResponses = [
   "Acknowledged. It's in the queue.",
 ];
 
-const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
+const DestinationScreen = ({ direction, onReturn, isMuted = false }: DestinationScreenProps) => {
   const [inputValue, setInputValue] = useState("");
   const [showResponse, setShowResponse] = useState(false);
   const [response, setResponse] = useState("");
   const [theme, setTheme] = useState<ThemeType>("default");
   const [canSkip, setCanSkip] = useState(false);
+  const funnyAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize funny sound
+  useEffect(() => {
+    funnyAudioRef.current = new Audio("/sounds/funny-moment.mp3");
+    funnyAudioRef.current.loop = true;
+    return () => {
+      if (funnyAudioRef.current) {
+        funnyAudioRef.current.pause();
+        funnyAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Play funny sound when response shows
+  useEffect(() => {
+    if (showResponse && !isMuted && funnyAudioRef.current) {
+      funnyAudioRef.current.currentTime = 0;
+      funnyAudioRef.current.play().catch(() => {});
+    }
+    return () => {
+      if (funnyAudioRef.current) {
+        funnyAudioRef.current.pause();
+      }
+    };
+  }, [showResponse, isMuted]);
 
   const themeConfig = useMemo(() => getThemeConfig(theme, direction), [theme, direction]);
 
@@ -185,14 +212,21 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
   }, [inputValue, direction]);
 
   const handleSkip = useCallback(() => {
+    if (funnyAudioRef.current) {
+      funnyAudioRef.current.pause();
+    }
     onReturn();
   }, [onReturn]);
 
-  // Enable skip after 2 seconds, auto-return after 5.5 seconds
   useEffect(() => {
     if (showResponse) {
       const skipTimer = setTimeout(() => setCanSkip(true), 2000);
-      const returnTimer = setTimeout(() => onReturn(), 5500);
+      const returnTimer = setTimeout(() => {
+        if (funnyAudioRef.current) {
+          funnyAudioRef.current.pause();
+        }
+        onReturn();
+      }, 5500);
       return () => {
         clearTimeout(skipTimer);
         clearTimeout(returnTimer);
