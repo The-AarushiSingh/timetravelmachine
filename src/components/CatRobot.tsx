@@ -1,95 +1,243 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
-const CatRobot = () => {
+interface CatRobotProps {
+  state?: "floating" | "waving" | "sitting" | "idle";
+  onAnimationComplete?: () => void;
+}
+
+const CatRobot = ({ state = "floating", onAnimationComplete }: CatRobotProps) => {
+  const [currentState, setCurrentState] = useState(state);
+  const [hasWaved, setHasWaved] = useState(false);
+
+  useEffect(() => {
+    if (state === "waving" && !hasWaved) {
+      setCurrentState("waving");
+      const timer = setTimeout(() => {
+        setHasWaved(true);
+        setCurrentState("sitting");
+        onAnimationComplete?.();
+      }, 2000);
+      return () => clearTimeout(timer);
+    } else {
+      setCurrentState(state);
+    }
+  }, [state, hasWaved, onAnimationComplete]);
+
+  const getAnimation = () => {
+    switch (currentState) {
+      case "floating":
+        return {
+          y: [-10, -25, -15, -10],
+          x: [0, 10, -5, 0],
+          rotate: [-3, 3, -2, -3],
+        };
+      case "waving":
+        return {
+          y: [-20],
+          rotate: [0],
+        };
+      case "sitting":
+      case "idle":
+        return {
+          y: [0, -5, 0],
+          rotate: [-1, 1, -1],
+        };
+      default:
+        return {};
+    }
+  };
+
   return (
     <motion.div
-      className="relative w-20 h-24 md:w-24 md:h-28"
-      animate={{
-        y: [-8, -20, -12, -8],
-        x: [0, 8, -5, 0],
-        rotate: [-3, 3, -2, -3],
-      }}
+      className="relative w-24 h-28 md:w-32 md:h-36"
+      animate={getAnimation()}
       transition={{
-        duration: 5,
-        repeat: Infinity,
+        duration: currentState === "waving" ? 0.5 : 4,
+        repeat: currentState === "waving" ? 0 : Infinity,
         ease: "easeInOut",
       }}
     >
+      {/* Glow effect under cat */}
+      <motion.div
+        className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-20 h-6 rounded-full"
+        style={{
+          background: "radial-gradient(ellipse, hsl(195 100% 55% / 0.4) 0%, transparent 70%)",
+        }}
+        animate={{
+          opacity: [0.3, 0.6, 0.3],
+          scale: [0.9, 1.1, 0.9],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+
       {/* Body */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-14 md:w-16 md:h-16 bg-cat-body rounded-2xl shadow-soft">
-        {/* Belly light */}
-        <motion.div
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-accent/60"
-          animate={{
-            opacity: [0.4, 0.8, 0.4],
+      <div 
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-16 md:w-20 md:h-20 rounded-2xl"
+        style={{
+          background: "linear-gradient(180deg, hsl(230 25% 35%) 0%, hsl(230 25% 25%) 100%)",
+          boxShadow: `
+            0 0 20px hsl(195 100% 55% / 0.3),
+            inset 0 2px 10px hsl(200 30% 50% / 0.3)
+          `,
+        }}
+      >
+        {/* Chest panel */}
+        <div 
+          className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-8 md:w-12 md:h-10 rounded-lg"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 30% 20%) 0%, hsl(230 25% 15%) 100%)",
+            border: "1px solid hsl(195 100% 55% / 0.3)",
           }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut",
+        >
+          {/* Power core */}
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 rounded-full"
+            style={{
+              background: "radial-gradient(circle, hsl(195 100% 60%) 0%, hsl(195 100% 40%) 100%)",
+              boxShadow: "0 0 15px hsl(195 100% 55%), 0 0 30px hsl(195 100% 55% / 0.5)",
+            }}
+            animate={{
+              opacity: [0.6, 1, 0.6],
+              scale: [0.9, 1.1, 0.9],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        </div>
+
+        {/* Legs */}
+        <div 
+          className="absolute -bottom-3 left-3 w-4 h-5 md:w-5 md:h-6 rounded-b-lg"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 25% 30%) 0%, hsl(230 25% 22%) 100%)",
           }}
         />
-        
-        {/* Legs */}
-        <div className="absolute -bottom-2 left-2 w-3 h-4 bg-cat-body rounded-b-lg" />
-        <div className="absolute -bottom-2 right-2 w-3 h-4 bg-cat-body rounded-b-lg" />
+        <div 
+          className="absolute -bottom-3 right-3 w-4 h-5 md:w-5 md:h-6 rounded-b-lg"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 25% 30%) 0%, hsl(230 25% 22%) 100%)",
+          }}
+        />
       </div>
 
       {/* Head */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-14 md:w-20 md:h-16 bg-cat-body rounded-t-3xl rounded-b-2xl shadow-soft">
+      <div 
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-18 md:w-24 md:h-20 rounded-t-3xl rounded-b-2xl"
+        style={{
+          background: "linear-gradient(180deg, hsl(230 25% 38%) 0%, hsl(230 25% 28%) 100%)",
+          boxShadow: `
+            0 0 25px hsl(195 100% 55% / 0.2),
+            inset 0 2px 15px hsl(200 30% 50% / 0.2)
+          `,
+        }}
+      >
         {/* Ears */}
-        <div className="absolute -top-3 left-1 w-4 h-5 bg-cat-body rounded-t-full transform -rotate-12" />
-        <div className="absolute -top-3 right-1 w-4 h-5 bg-cat-body rounded-t-full transform rotate-12" />
-        <div className="absolute -top-2 left-1.5 w-2 h-3 bg-cat-accent/60 rounded-t-full transform -rotate-12" />
-        <div className="absolute -top-2 right-1.5 w-2 h-3 bg-cat-accent/60 rounded-t-full transform rotate-12" />
+        <div 
+          className="absolute -top-4 left-1 w-5 h-6 rounded-t-full transform -rotate-12"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 25% 35%) 0%, hsl(230 25% 28%) 100%)",
+          }}
+        >
+          <motion.div 
+            className="absolute top-1 left-1 w-2.5 h-3 rounded-t-full"
+            style={{
+              background: "hsl(195 100% 55% / 0.6)",
+              boxShadow: "0 0 8px hsl(195 100% 55% / 0.5)",
+            }}
+            animate={{
+              opacity: [0.4, 0.8, 0.4],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        </div>
+        <div 
+          className="absolute -top-4 right-1 w-5 h-6 rounded-t-full transform rotate-12"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 25% 35%) 0%, hsl(230 25% 28%) 100%)",
+          }}
+        >
+          <motion.div 
+            className="absolute top-1 right-1 w-2.5 h-3 rounded-t-full"
+            style={{
+              background: "hsl(195 100% 55% / 0.6)",
+              boxShadow: "0 0 8px hsl(195 100% 55% / 0.5)",
+            }}
+            animate={{
+              opacity: [0.4, 0.8, 0.4],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5,
+            }}
+          />
+        </div>
 
-        {/* Face */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 md:w-14 flex flex-col items-center">
+        {/* Face visor */}
+        <div 
+          className="absolute top-4 left-1/2 -translate-x-1/2 w-16 md:w-18 h-10 rounded-lg"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 30% 15%) 0%, hsl(230 25% 10%) 100%)",
+            border: "2px solid hsl(195 100% 55% / 0.4)",
+            boxShadow: "inset 0 0 15px hsl(195 100% 55% / 0.2)",
+          }}
+        >
           {/* Eyes */}
-          <div className="flex gap-4 mb-1">
+          <div className="flex justify-center gap-5 pt-2">
             <motion.div
-              className="w-3 h-3 bg-foreground/80 rounded-full"
+              className="w-4 h-4 md:w-5 md:h-5 rounded-full"
+              style={{
+                background: "radial-gradient(circle at 30% 30%, hsl(150 100% 70%) 0%, hsl(150 100% 45%) 100%)",
+                boxShadow: "0 0 10px hsl(150 100% 50%), 0 0 20px hsl(150 100% 50% / 0.5)",
+              }}
               animate={{
                 scaleY: [1, 0.1, 1],
               }}
               transition={{
-                duration: 3,
+                duration: 4,
                 repeat: Infinity,
                 repeatDelay: 2,
-                times: [0, 0.5, 1],
+                times: [0, 0.05, 0.1],
               }}
-            >
-              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 bg-background rounded-full" />
-            </motion.div>
+            />
             <motion.div
-              className="w-3 h-3 bg-foreground/80 rounded-full"
+              className="w-4 h-4 md:w-5 md:h-5 rounded-full"
+              style={{
+                background: "radial-gradient(circle at 30% 30%, hsl(150 100% 70%) 0%, hsl(150 100% 45%) 100%)",
+                boxShadow: "0 0 10px hsl(150 100% 50%), 0 0 20px hsl(150 100% 50% / 0.5)",
+              }}
               animate={{
                 scaleY: [1, 0.1, 1],
               }}
               transition={{
-                duration: 3,
+                duration: 4,
                 repeat: Infinity,
                 repeatDelay: 2,
-                times: [0, 0.5, 1],
+                times: [0, 0.05, 0.1],
               }}
-            >
-              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 bg-background rounded-full" />
-            </motion.div>
-          </div>
-          
-          {/* Nose */}
-          <div className="w-2 h-1.5 bg-cat-accent rounded-full" />
-          
-          {/* Mouth */}
-          <div className="flex gap-0.5 mt-0.5">
-            <div className="w-2 h-1 border-b-2 border-r border-foreground/40 rounded-br-full" />
-            <div className="w-2 h-1 border-b-2 border-l border-foreground/40 rounded-bl-full" />
+            />
           </div>
         </div>
 
         {/* Antenna */}
         <motion.div
-          className="absolute -top-5 left-1/2 -translate-x-1/2 w-0.5 h-4 bg-cat-body"
+          className="absolute -top-8 left-1/2 -translate-x-1/2 w-1 h-5"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 25% 40%) 0%, hsl(230 25% 30%) 100%)",
+          }}
           animate={{
             rotate: [-10, 10, -10],
           }}
@@ -100,13 +248,17 @@ const CatRobot = () => {
           }}
         >
           <motion.div
-            className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-accent"
+            className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+            style={{
+              background: "radial-gradient(circle, hsl(280 100% 70%) 0%, hsl(280 100% 50%) 100%)",
+              boxShadow: "0 0 15px hsl(280 100% 65%), 0 0 30px hsl(280 100% 65% / 0.5)",
+            }}
             animate={{
               opacity: [0.5, 1, 0.5],
-              scale: [0.8, 1.1, 0.8],
+              scale: [0.8, 1.2, 0.8],
             }}
             transition={{
-              duration: 1.5,
+              duration: 1,
               repeat: Infinity,
               ease: "easeInOut",
             }}
@@ -114,18 +266,87 @@ const CatRobot = () => {
         </motion.div>
       </div>
 
-      {/* Tail */}
+      {/* Arm - for waving */}
       <motion.div
-        className="absolute bottom-4 -right-4 w-8 h-2 bg-cat-body rounded-full origin-left"
-        animate={{
-          rotate: [-15, 15, -15],
+        className="absolute top-14 -right-2 w-4 h-8 rounded-full origin-top"
+        style={{
+          background: "linear-gradient(180deg, hsl(230 25% 32%) 0%, hsl(230 25% 25%) 100%)",
+        }}
+        animate={currentState === "waving" ? {
+          rotate: [0, -30, 30, -30, 30, 0],
+        } : {
+          rotate: [0, 5, 0],
         }}
         transition={{
-          duration: 2,
+          duration: currentState === "waving" ? 1.5 : 3,
+          repeat: currentState === "waving" ? 0 : Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        {/* Hand */}
+        <div 
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 25% 35%) 0%, hsl(230 25% 28%) 100%)",
+          }}
+        />
+      </motion.div>
+
+      {/* Other arm */}
+      <motion.div
+        className="absolute top-14 -left-2 w-4 h-8 rounded-full origin-top"
+        style={{
+          background: "linear-gradient(180deg, hsl(230 25% 32%) 0%, hsl(230 25% 25%) 100%)",
+        }}
+        animate={{
+          rotate: [0, -5, 0],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 0.5,
+        }}
+      >
+        <div 
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full"
+          style={{
+            background: "linear-gradient(180deg, hsl(230 25% 35%) 0%, hsl(230 25% 28%) 100%)",
+          }}
+        />
+      </motion.div>
+
+      {/* Tail */}
+      <motion.div
+        className="absolute bottom-6 -right-6 w-10 h-3 rounded-full origin-left"
+        style={{
+          background: "linear-gradient(90deg, hsl(230 25% 30%) 0%, hsl(230 25% 38%) 100%)",
+        }}
+        animate={{
+          rotate: [-20, 20, -20],
+        }}
+        transition={{
+          duration: 1.5,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-      />
+      >
+        <motion.div
+          className="absolute -right-1 top-0 w-3 h-3 rounded-full"
+          style={{
+            background: "hsl(195 100% 55%)",
+            boxShadow: "0 0 10px hsl(195 100% 55%)",
+          }}
+          animate={{
+            opacity: [0.5, 1, 0.5],
+          }}
+          transition={{
+            duration: 1,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </motion.div>
     </motion.div>
   );
 };

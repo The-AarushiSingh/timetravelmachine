@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import TimeMachine from "./TimeMachine";
 import CatRobot from "./CatRobot";
 
@@ -8,67 +9,110 @@ interface PresentScreenProps {
 }
 
 const PresentScreen = ({ onNavigate, hasReturned }: PresentScreenProps) => {
+  const [catState, setCatState] = useState<"floating" | "waving" | "sitting">("floating");
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    // Cat entrance sequence
+    const timer = setTimeout(() => {
+      setCatState("waving");
+    }, 1500);
+    
+    const welcomeTimer = setTimeout(() => {
+      setShowWelcome(true);
+    }, 800);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(welcomeTimer);
+    };
+  }, []);
+
   return (
     <motion.div
-      className="min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden"
+      className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Background gradient */}
-      <div className="absolute inset-0 gradient-sky pointer-events-none" />
+      {/* Cyber grid background */}
+      <div className="absolute inset-0 cyber-grid" />
       
-      {/* Cat robot - floating around */}
-      <motion.div
-        className="absolute"
-        initial={{ opacity: 0, x: 100 }}
-        animate={{ 
-          opacity: 1, 
-          x: 0,
+      {/* Gradient overlays */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at center, hsl(195 100% 55% / 0.08) 0%, transparent 50%)",
         }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        style={{ 
-          top: "20%",
-          right: "15%",
+      />
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at 30% 20%, hsl(280 100% 65% / 0.06) 0%, transparent 40%)",
         }}
-      >
-        <CatRobot />
-      </motion.div>
+      />
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at 70% 80%, hsl(150 100% 50% / 0.06) 0%, transparent 40%)",
+        }}
+      />
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center">
-        {/* Time machine */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <TimeMachine />
-        </motion.div>
+        {/* Time machine with cat on top */}
+        <div className="relative">
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <TimeMachine />
+          </motion.div>
+
+          {/* Cat robot - positioned on top of machine */}
+          <motion.div
+            className="absolute -top-8 md:-top-4 left-1/2 -translate-x-1/2"
+            initial={{ opacity: 0, y: -100, x: 100 }}
+            animate={{ 
+              opacity: 1, 
+              y: catState === "sitting" ? 0 : -20,
+              x: 0,
+            }}
+            transition={{ 
+              delay: 0.8, 
+              duration: 1.2,
+              type: "spring",
+              stiffness: 100,
+            }}
+          >
+            <CatRobot state={catState} onAnimationComplete={() => setCatState("sitting")} />
+          </motion.div>
+        </div>
 
         {/* Text */}
         <motion.div
-          className="mt-12 text-center"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
+          className="mt-16 md:mt-20 text-center"
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: showWelcome ? 1 : 0 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
         >
           {hasReturned ? (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.8 }}
             >
-              <h1 className="text-3xl md:text-4xl font-serif text-foreground mb-2">
+              <h1 className="text-3xl md:text-5xl font-display neon-text-blue mb-4">
                 You're back.
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground italic">
-                This moment still listens.
+              <p className="text-xl md:text-2xl text-muted-foreground font-sans">
+                The present still matters the most.
               </p>
             </motion.div>
           ) : (
-            <h1 className="text-3xl md:text-4xl font-serif text-foreground">
+            <h1 className="text-3xl md:text-5xl font-display neon-text-blue">
               Where do you want to go?
             </h1>
           )}
@@ -76,68 +120,82 @@ const PresentScreen = ({ onNavigate, hasReturned }: PresentScreenProps) => {
 
         {/* Buttons */}
         <motion.div
-          className="flex gap-6 mt-10"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
+          className="flex gap-6 md:gap-8 mt-12"
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: showWelcome ? 1 : 0 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
         >
           <motion.button
             onClick={() => onNavigate("past")}
-            className="px-10 py-4 text-lg font-medium bg-secondary text-secondary-foreground rounded-full shadow-soft hover:shadow-float transition-all border-2 border-transparent hover:border-primary/20"
-            whileHover={{ scale: 1.05, y: -2 }}
+            className="relative px-10 md:px-14 py-4 md:py-5 text-xl md:text-2xl font-display uppercase tracking-widest rounded-lg overflow-hidden group"
+            style={{
+              background: "linear-gradient(135deg, hsl(230 30% 12%) 0%, hsl(230 25% 8%) 100%)",
+              border: "2px solid hsl(280 100% 65%)",
+              boxShadow: "0 0 20px hsl(280 100% 65% / 0.3), inset 0 0 20px hsl(280 100% 65% / 0.1)",
+            }}
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: "0 0 40px hsl(280 100% 65% / 0.5), inset 0 0 30px hsl(280 100% 65% / 0.2)",
+            }}
             whileTap={{ scale: 0.95 }}
           >
-            PAST
+            <span className="neon-text-violet">PAST</span>
+            <motion.div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{
+                background: "radial-gradient(circle at center, hsl(280 100% 65% / 0.2) 0%, transparent 70%)",
+              }}
+            />
           </motion.button>
           
           <motion.button
             onClick={() => onNavigate("future")}
-            className="px-10 py-4 text-lg font-medium bg-primary text-primary-foreground rounded-full shadow-soft hover:shadow-float transition-all"
-            whileHover={{ scale: 1.05, y: -2 }}
+            className="relative px-10 md:px-14 py-4 md:py-5 text-xl md:text-2xl font-display uppercase tracking-widest rounded-lg overflow-hidden group"
+            style={{
+              background: "linear-gradient(135deg, hsl(230 30% 12%) 0%, hsl(230 25% 8%) 100%)",
+              border: "2px solid hsl(150 100% 50%)",
+              boxShadow: "0 0 20px hsl(150 100% 50% / 0.3), inset 0 0 20px hsl(150 100% 50% / 0.1)",
+            }}
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: "0 0 40px hsl(150 100% 50% / 0.5), inset 0 0 30px hsl(150 100% 50% / 0.2)",
+            }}
             whileTap={{ scale: 0.95 }}
           >
-            FUTURE
+            <span className="neon-text-green">FUTURE</span>
+            <motion.div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{
+                background: "radial-gradient(circle at center, hsl(150 100% 50% / 0.2) 0%, transparent 70%)",
+              }}
+            />
           </motion.button>
         </motion.div>
       </div>
 
-      {/* Decorative elements */}
-      <motion.div
-        className="absolute bottom-10 left-10 w-3 h-3 rounded-full bg-accent/40"
-        animate={{
-          y: [-10, 10, -10],
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute top-20 left-20 w-2 h-2 rounded-full bg-primary/30"
-        animate={{
-          y: [-15, 15, -15],
-          x: [-5, 5, -5],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="absolute bottom-32 right-20 w-4 h-4 rounded-full bg-secondary/50"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.4, 0.7, 0.4],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      {/* Ambient floating particles */}
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full"
+          style={{
+            background: i % 3 === 0 ? "hsl(195 100% 55%)" : i % 3 === 1 ? "hsl(280 100% 65%)" : "hsl(150 100% 50%)",
+            left: `${10 + (i * 7)}%`,
+            top: `${15 + (i % 5) * 18}%`,
+            boxShadow: "0 0 8px currentColor",
+          }}
+          animate={{
+            y: [-15, 15, -15],
+            opacity: [0.3, 0.8, 0.3],
+          }}
+          transition={{
+            duration: 3 + i * 0.3,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: i * 0.2,
+          }}
+        />
+      ))}
     </motion.div>
   );
 };

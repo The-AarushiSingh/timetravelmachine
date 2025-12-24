@@ -7,19 +7,19 @@ interface DestinationScreenProps {
 }
 
 const pastResponses = [
-  "That version of you already tried.",
-  "That timeline is closed.",
-  "You did what you could back then.",
-  "Some doors stay closed for good reasons.",
-  "The past is patient. It can wait forever.",
+  "That version of you already did their best with what they knew.",
+  "You survived it. That mattered more than perfection.",
+  "Some lessons only work once.",
+  "The past heard you. It just can't answer.",
+  "That timeline is sealed. You're the one who made it out.",
 ];
 
 const futureResponses = [
-  "Future noted.",
-  "No ETA, but acknowledged.",
-  "The present will handle it.",
-  "Filed under 'eventually'.",
-  "Hope received. Processing indefinitely.",
+  "Noted. The future is listening, but not replying yet.",
+  "Hope logged. No delivery date available.",
+  "Let's not spoil it.",
+  "Filed. The universe will get back to you.",
+  "Acknowledged. No ETA, but it's in the queue.",
 ];
 
 const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
@@ -38,104 +38,104 @@ const DestinationScreen = ({ direction, onReturn }: DestinationScreenProps) => {
 
     setTimeout(() => {
       onReturn();
-    }, 3000);
+    }, 4000);
   };
 
-  const prompt = direction === "past" 
-    ? "What would you do differently?" 
-    : "What do you hope happens?";
+  const prompt = direction === "past" ? "What would you change?" : "What are you hoping for?";
 
   return (
     <motion.div
-      className="min-h-screen flex flex-col items-center justify-center p-8"
+      className="min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
+      <div className="absolute inset-0 cyber-grid opacity-20" />
+      
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at center, 
+            ${direction === "past" ? "hsl(280 100% 65% / 0.15)" : "hsl(150 100% 50% / 0.15)"} 0%, 
+            transparent 60%)`
+        }}
+      />
+
       {!showResponse ? (
         <motion.div
-          className="w-full max-w-md text-center"
-          initial={{ y: 20, opacity: 0 }}
+          className="relative z-10 w-full max-w-lg text-center"
+          initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }}
         >
-          <h2 className="text-3xl md:text-4xl font-serif mb-8 text-foreground">
+          <h2 className={`text-4xl md:text-5xl font-display mb-12 ${direction === "past" ? "neon-text-violet" : "neon-text-green"}`}>
             {prompt}
           </h2>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <motion.input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Type your thoughts..."
-              className="w-full px-6 py-4 text-lg bg-card border-2 border-border rounded-2xl focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/50"
-              autoFocus
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.3 }}
-            />
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="relative">
+              <motion.input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Type anything..."
+                className="w-full px-6 py-5 text-xl bg-transparent border-b-2 border-neon-blue/50 
+                           focus:border-neon-blue focus:outline-none transition-all placeholder:text-muted-foreground/40
+                           text-center font-sans tracking-wide"
+                autoFocus
+              />
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-0.5"
+                style={{
+                  background: "linear-gradient(90deg, transparent, hsl(195 100% 55%), transparent)",
+                  boxShadow: "0 0 20px hsl(195 100% 55% / 0.5)",
+                }}
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </div>
             
             <motion.button
               type="submit"
-              className="px-8 py-3 text-lg font-medium bg-primary text-primary-foreground rounded-full shadow-soft hover:shadow-float transition-all disabled:opacity-50"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               disabled={!inputValue.trim()}
+              className="px-12 py-4 text-xl font-display uppercase tracking-widest rounded-lg
+                         disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{
+                background: "linear-gradient(135deg, hsl(230 30% 15%) 0%, hsl(230 25% 10%) 100%)",
+                border: "2px solid hsl(195 100% 55%)",
+                boxShadow: inputValue.trim() ? "0 0 20px hsl(195 100% 55% / 0.4)" : "none",
+              }}
+              whileHover={{ scale: inputValue.trim() ? 1.05 : 1 }}
+              whileTap={{ scale: inputValue.trim() ? 0.95 : 1 }}
             >
-              Submit to time
+              <span className="neon-text-blue">Submit</span>
             </motion.button>
           </form>
         </motion.div>
       ) : (
         <motion.div
-          className="text-center max-w-md"
+          className="relative z-10 text-center max-w-xl px-4"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
         >
           <motion.p
-            className="text-2xl md:text-3xl font-serif italic text-foreground leading-relaxed"
-            initial={{ y: 20 }}
-            animate={{ y: 0 }}
-            transition={{ delay: 0.2 }}
+            className={`text-2xl md:text-3xl font-display leading-relaxed ${direction === "past" ? "neon-text-violet" : "neon-text-green"}`}
           >
             "{response}"
           </motion.p>
           
           <motion.p
-            className="mt-8 text-muted-foreground"
+            className="mt-12 text-muted-foreground font-sans text-lg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
+            transition={{ delay: 1.5 }}
           >
             Returning to the present...
           </motion.p>
         </motion.div>
       )}
-
-      {/* Ambient particles */}
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1.5 h-1.5 rounded-full bg-accent/30"
-          style={{
-            left: `${10 + i * 12}%`,
-            top: `${20 + (i % 4) * 20}%`,
-          }}
-          animate={{
-            y: [-20, 20, -20],
-            opacity: [0.2, 0.5, 0.2],
-          }}
-          transition={{
-            duration: 4 + i * 0.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.3,
-          }}
-        />
-      ))}
     </motion.div>
   );
 };
