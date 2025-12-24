@@ -60,11 +60,12 @@ const Index = () => {
   };
 
   const handleTransitionComplete = () => {
-    stopSound();
+    // Sound continues playing through destination screen
     setScreen("destination");
   };
 
   const handleReturn = () => {
+    stopSound(); // Stop sound when returning to present
     setHasReturned(true);
     setDirection(null);
     setScreen("present");
