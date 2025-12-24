@@ -19,7 +19,7 @@ const Index = () => {
   // Initialize audio on first render
   useEffect(() => {
     audioRef.current = new Audio("/sounds/time-travel.mp3");
-    audioRef.current.loop = false;
+    audioRef.current.loop = true; // Loop continuously during travel
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
