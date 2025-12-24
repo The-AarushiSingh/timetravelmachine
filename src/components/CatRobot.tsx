@@ -1,60 +1,20 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 
 interface CatRobotProps {
-  state?: "floating" | "waving" | "sitting" | "idle";
-  onAnimationComplete?: () => void;
+  isWaving?: boolean;
 }
 
-const CatRobot = ({ state = "floating", onAnimationComplete }: CatRobotProps) => {
-  const [currentState, setCurrentState] = useState(state);
-  const [hasWaved, setHasWaved] = useState(false);
-
-  useEffect(() => {
-    if (state === "waving" && !hasWaved) {
-      setCurrentState("waving");
-      const timer = setTimeout(() => {
-        setHasWaved(true);
-        setCurrentState("sitting");
-        onAnimationComplete?.();
-      }, 2000);
-      return () => clearTimeout(timer);
-    } else {
-      setCurrentState(state);
-    }
-  }, [state, hasWaved, onAnimationComplete]);
-
-  const getAnimation = () => {
-    switch (currentState) {
-      case "floating":
-        return {
-          y: [-10, -25, -15, -10],
-          x: [0, 10, -5, 0],
-          rotate: [-3, 3, -2, -3],
-        };
-      case "waving":
-        return {
-          y: [-20],
-          rotate: [0],
-        };
-      case "sitting":
-      case "idle":
-        return {
-          y: [0, -5, 0],
-          rotate: [-1, 1, -1],
-        };
-      default:
-        return {};
-    }
-  };
-
+const CatRobot = ({ isWaving = true }: CatRobotProps) => {
   return (
     <motion.div
       className="relative w-24 h-28 md:w-32 md:h-36"
-      animate={getAnimation()}
+      animate={{
+        y: [0, -5, 0],
+        rotate: [-1, 1, -1],
+      }}
       transition={{
-        duration: currentState === "waving" ? 0.5 : 4,
-        repeat: currentState === "waving" ? 0 : Infinity,
+        duration: 4,
+        repeat: Infinity,
         ease: "easeInOut",
       }}
     >
@@ -272,14 +232,14 @@ const CatRobot = ({ state = "floating", onAnimationComplete }: CatRobotProps) =>
         style={{
           background: "linear-gradient(180deg, hsl(230 25% 32%) 0%, hsl(230 25% 25%) 100%)",
         }}
-        animate={currentState === "waving" ? {
-          rotate: [0, -30, 30, -30, 30, 0],
+        animate={isWaving ? {
+          rotate: [0, -40, 40, -40, 40, 0],
         } : {
           rotate: [0, 5, 0],
         }}
         transition={{
-          duration: currentState === "waving" ? 1.5 : 3,
-          repeat: currentState === "waving" ? 0 : Infinity,
+          duration: isWaving ? 1.2 : 3,
+          repeat: Infinity,
           ease: "easeInOut",
         }}
       >
